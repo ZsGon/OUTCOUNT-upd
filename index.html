@@ -305,14 +305,18 @@ body.side:not(.tutoring) #sideR .trayrow{flex-direction:column;flex-wrap:nowrap;
 .sidecol .b{padding:0 10px;gap:6px}
 /* Blitz: Werkzeuge und Pin gibt es dort nicht - ganz weg statt unsichtbar, damit Undo und Steine mittig sitzen */
 body.blitzing.side .sidecol .tool, body.blitzing.side .sidecol #aMark{display:none}
-/* Tutorial im breiten Fenster: Brett links, Karte und Steine rechts (die Karte ist zu hoch fuer oben) */
-body.side.tutoring #scGame.on{display:grid;grid-template-columns:minmax(0,1fr) minmax(330px,410px);
-  grid-template-rows:auto auto auto auto auto auto 1fr;column-gap:22px;padding-bottom:10px;align-items:start}
-body.side.tutoring #scGame > .row{grid-column:1 / -1;grid-row:1}
-body.side.tutoring #scGame .stage{grid-column:1;grid-row:2 / -1;margin:0;align-self:stretch;min-height:0}
-body.side.tutoring #tutBar{grid-column:2;grid-row:4}
-body.side.tutoring #dock{grid-column:2;grid-row:7;position:static;background:none;padding:8px 0 0;align-self:start;z-index:auto}
-body.side.tutoring .trayrow{flex-wrap:wrap;margin-bottom:12px;max-width:none}
+/* Tutorial im breiten Fenster - wie die Level: Karte oben mittig, Brett mittig, Steine rechts daneben */
+body.side.tutoring #scGame.on{display:grid;
+  grid-template-columns:minmax(132px,1fr) var(--bw,minmax(0,3fr)) minmax(132px,1fr);
+  grid-template-rows:auto minmax(0,1fr);column-gap:20px;row-gap:0;padding-bottom:12px;align-items:center}
+body.side.tutoring #tutBar{grid-column:1 / -1;grid-row:1;justify-self:center;width:min(640px,100%);box-sizing:border-box}
+body.side.tutoring #scGame .stage{grid-column:2;grid-row:2;align-self:stretch;margin:0;min-height:0}
+body.side.tutoring #dock{display:none}
+body.side.tutoring .sidecol{display:flex;flex-direction:column;align-items:center;gap:12px;grid-row:2;align-self:center}
+body.side.tutoring #sideL{grid-column:1;justify-self:end;visibility:hidden}   /* Werkzeuge gibt es im Tutorial nicht */
+body.side.tutoring #sideR{grid-column:3;justify-self:start}
+body.side.tutoring #aMark{display:none}
+body.side.tutoring #sideR .trayrow{flex-direction:column;flex-wrap:nowrap;gap:10px;margin:0;min-height:0;width:auto}
 body.side.tutoring #coach{display:none}
 /* Startseite im breiten Fenster: Logo links, Knoepfe rechts - passt ohne Scrollen bis 800x450 */
 body.side.home main{max-width:900px}
@@ -1248,13 +1252,13 @@ function applySide(){
   document.body.classList.toggle('side',on);
   if(on && d.parentElement!==$('scGame')) $('scGame').appendChild(d);
   else if(!on && d.parentElement!==document.body) document.body.appendChild(d);
-  arrangeSides(on && !tutActive);   // Level: kompakte Stapel links/rechts; Tutorial: alte Leiste
+  arrangeSides(on);   // breit: Steine (und im Level die Werkzeuge) als Stapel neben dem Brett - auch im Tutorial
 }
 function layout(){
   applySide();
   const n=size, b=$('board'), stage=b.parentElement.parentElement, pad=20;
   let w=(stage.clientWidth||460)-pad; let h=(stage.clientHeight||460)-pad;
-  const sideLv=document.body.classList.contains('side') && !tutActive;   // Breitbild-Level: Brettspalte wird passend zum Brett gesetzt
+  const sideLv=document.body.classList.contains('side');   // Breitbild (Level und Tutorial): Brettspalte wird passend zum Brett gesetzt
   if(sideLv){ const g=$('scGame'), cs=getComputedStyle(g);
     w=g.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight)-2*132-2*20-pad; }
   const dk=$('dock'); if(!document.body.classList.contains('side') && dk && !dk.classList.contains('hide') && dk.offsetParent!==null){
